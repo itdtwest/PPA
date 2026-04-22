@@ -1,34 +1,241 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Loading Asset...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  
+  <title>Asset Viewer</title>
+
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: sans-serif;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      background: #fff;
+      background-color: #ffffff;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
     }
+
+    #particleCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .wrapper {
+      width: 80%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .bg-logo-left, .bg-logo-right {
+      position: fixed;
+      top: 25px;
+      max-height: 100px;
+      width: auto;
+      z-index: 5;
+      opacity: 0.9;
+    }
+    .bg-logo-left { left: 25px; }
+    .bg-logo-right { right: 25px; }
+
+    .site-header {
+      font-size: 20px;
+      font-weight: 800;
+      color: #111;
+      letter-spacing: 4px;
+      margin-bottom: 25px;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    .card {
+      background: rgba(255,255,255,0.95);
+      width: 100%;
+      border-radius: 16px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+      padding: 30px 25px;
+      animation: slideUp 0.6s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card::before {
+      content: '';
+      display: block;
+      height: 5px;
+      background: linear-gradient(90deg,#ff4da6,#4dd2ff);
+      border-radius: 8px 8px 0 0;
+      margin: -30px -25px 20px;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .data-item {
+      background: #f5f5f5;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+
+    .label {
+      font-size: 11px;
+      color: #888;
+      text-transform: uppercase;
+    }
+
+    .value {
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .id-badge {
+      margin-top: 15px;
+      font-size: 12px;
+      color: #777;
+      text-align: center;
+    }
+
+    .error { color: red; text-align: center; }
+
+    /* Skeleton loading */
+    .skeleton {
+      height: 16px;
+      background: linear-gradient(90deg,#eee,#ddd,#eee);
+      animation: shimmer 1.2s infinite;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    @keyframes shimmer {
+      0% { background-position: -200px 0; }
+      100% { background-position: 200px 0; }
+    }
+
   </style>
 </head>
 
 <body>
-  <div>Loading...</div>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
+<canvas id="particleCanvas"></canvas>
 
-    if (!id) {
-      document.body.innerHTML = "ID tidak ditemukan";
-    } else {
-      window.location.href =
-        "https://script.google.com/macros/s/AKfycbycZStaP7DU7cQgSTAnR5Au14bJBaXwvee4QqD7pgeF/exec?id=" + id;
-    }
-  </script>
+<img class="bg-logo-left" src="https://iconlogovector.com/uploads/images/2025/08/lg-688e9cd4b2d3d-Mie-Gacoan.webp">
+<img class="bg-logo-right" src="https://cc.dinus.ac.id/assets/uploads/penyedia/42dfb-pt.-pesta-pora-abadi.png">
+
+<div class="wrapper">
+  <div class="site-header">CP3 MAJALENGKA</div>
+
+  <div class="card" id="card">
+    <!-- skeleton -->
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+  </div>
+
+  <div class="footer-credit">IRGA CP3 x Renagge</div>
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbycZStaP7DU7cQgSTAnR5Au14bJBaXwvee4QqD7pgeF/exec";
+
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+const card = document.getElementById("card");
+
+if (!id) {
+  card.innerHTML = "<div class='error'>ID tidak ditemukan</div>";
+} else {
+  fetch(API_URL + "?id=" + id)
+    .then(res => res.json())
+    .then(data => {
+
+      if (!data) {
+        card.innerHTML = `
+          <div class="error">Aset tidak ditemukan</div>
+          <div class="id-badge">${id}</div>
+        `;
+        return;
+      }
+
+      card.innerHTML = `
+        <div class="title">${data.deskripsi}</div>
+
+        <div class="data-item">
+          <div class="label">Merk</div>
+          <div class="value">${data.merk || '-'}</div>
+        </div>
+
+        <div class="data-item">
+          <div class="label">Lokasi</div>
+          <div class="value">${data.lokasi || '-'}</div>
+        </div>
+
+        <div class="data-item">
+          <div class="label">Qty</div>
+          <div class="value">${data.qty || '-'}</div>
+        </div>
+
+        <div class="id-badge">ID: ${id}</div>
+      `;
+    })
+    .catch(() => {
+      card.innerHTML = "<div class='error'>Error load data</div>";
+    });
+}
+
+/* PARTICLE ENGINE */
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+let w = canvas.width = window.innerWidth;
+let h = canvas.height = window.innerHeight;
+
+window.onresize = () => {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+};
+
+let particles = [];
+
+for (let i=0;i<50;i++){
+  particles.push({
+    x: Math.random()*w,
+    y: Math.random()*h,
+    size: Math.random()*5+2,
+    speed: Math.random()+0.5
+  });
+}
+
+function animate(){
+  ctx.clearRect(0,0,w,h);
+  particles.forEach(p=>{
+    p.y += p.speed;
+    if(p.y>h) p.y=0;
+    ctx.fillStyle = "#4dd2ff33";
+    ctx.fillRect(p.x,p.y,p.size,p.size);
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+
 </body>
 </html>
