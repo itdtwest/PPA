@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Loading Asset...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <div>Loading...</div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    if (!id) {
+      document.body.innerHTML = "ID tidak ditemukan";
+    } else {
+      window.location.href =
+        "https://script.google.com/macros/s/AKfycbycZStaP7DU7cQgSTAnR5Au14bJBaXwvee4QqD7pgeF/exec?id=" + id;
+    }
+  </script>
+</body>
+</html>
