@@ -104,33 +104,27 @@ border-radius:6px;margin-bottom:15px
 </div>
 
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbykga7ETTK1SaLoOS-pxFdBgg0VzgkMd4aLVnxrN1Hv_BqfO-AjV_23phin9hnup3GghQ/exec";
-const idScan=new URLSearchParams(window.location.search).get("id");
-const app=document.getElementById("appContainer");
-
+const API_URL="https://script.google.com/macros/s/AKfycbxyvPHQy5618KxkX4H_nIuYG3NKWwexPPRxgi7lX02p36CaHOFKs_zTRlo3zP1hVp_a7w/exec";
+const idScan=new URLSearchParams(window.location.search).get("id"), app=document.getElementById("appContainer");
 if(!idScan){
-app.innerHTML=`<div class="error-title">INVALID PARAMETER</div>
-<div class="error-msg">URL harus ada ?id=</div>`;
+  app.innerHTML=`<div class="error-title">INVALID PARAMETER</div><div class="error-msg">URL harus ada ?id=</div>`;
 }else{
-fetch(API_URL+"?id="+encodeURIComponent(idScan))
-.then(r=>r.json())
-.then(res=>{
-if(!res||res.status==="error"){
-app.innerHTML=`<div class="error-title">Aset Tidak Ditemukan</div>
-<div class="id-badge">${idScan}</div>`;
-return;
-}
-const d=res.data;
-app.innerHTML=`
-<div class="title">${d.deskripsi||d.namaAsset||'-'}</div>
-<div class="data-item"><div class="label">Merk</div><div class="value">${d.merk||'-'}</div></div>
-<div class="data-item"><div class="label">Lokasi</div><div class="value">${d.lokasi||'-'}</div></div>
-<div class="data-item"><div class="label">Qty</div><div class="value">${d.qty||'-'}</div></div>
-<div class="id-badge">${idScan}</div>`;
-})
-.catch(()=>{
-app.innerHTML=`<div class="error-title">Koneksi gagal</div>`;
-});
+  fetch(API_URL+"?id="+encodeURIComponent(idScan)).then(r=>r.json()).then(res=>{
+    if(!res||res.status==="error"){
+      app.innerHTML=`<div class="error-title">Aset Tidak Ditemukan</div><div class="id-badge">${idScan}</div>`;
+      return;
+    }
+    const d=res.data, src=res.source==="cache"?"⚡ Cached":"☁️ Realtime";
+    app.innerHTML=`<div class="title">${d.deskripsi||d.namaAsset||'-'}</div>
+      <div class="data-item"><div class="label">No / ID</div><div class="value">${d.no||'-'}</div></div>
+      <div class="data-item"><div class="label">Merk</div><div class="value">${d.merk||'-'}</div></div>
+      <div class="data-item"><div class="label">Lokasi</div><div class="value">${d.lokasi||'-'}</div></div>
+      <div class="data-item"><div class="label">Qty</div><div class="value">${d.qty||'-'}</div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;">
+        <div class="id-badge" style="flex:1;margin-right:10px">${idScan}</div>
+        <div style="font-size:10px;color:#aaa;font-weight:bold;text-transform:uppercase;background:#eee;padding:4px 8px;border-radius:4px">${src}</div>
+      </div>`;
+  }).catch(()=>app.innerHTML=`<div class="error-title">Koneksi gagal</div>`);
 }
 
 const c=document.getElementById('particleCanvas');
