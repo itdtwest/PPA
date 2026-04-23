@@ -212,7 +212,7 @@
 // ==========================================
 // 1. ENGINE FETCH API (BACKEND COMMUNICATION)
 // ==========================================
-const API_URL = "https://script.google.com/macros/s/AKfycbycZStaP7DU7cQgSTAnR5Au14bJBaXwvee4QqD7pgeF/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbykga7ETTK1SaLoOS-pxFdBgg0VzgkMd4aLVnxrN1Hv_BqfO-AjV_23phin9hnup3GghQ/exec";
 const params = new URLSearchParams(window.location.search);
 const idScan = params.get("id");
 const appContainer = document.getElementById("appContainer");
@@ -225,47 +225,48 @@ if (!idScan) {
 } else {
   // Mengambil data JSON dari Google Apps Script
   fetch(API_URL + "?id=" + encodeURIComponent(idScan))
-    .then(res => res.json())
-    .then(data => {
-      // Jika response gagal atau ID tidak cocok
-      if (!data || data.status === "error") {
-        appContainer.innerHTML = `
-          <div class="error-title">Aset Tidak Ditemukan</div>
-          <div class="error-msg">Data dengan No. Seri tersebut tidak terdaftar di sistem.</div>
-          <div class="id-badge">ID: ${idScan}</div>
-        `;
-        return;
-      }
+  .then(res => res.json())
+  .then(res => {
 
-      // Render Payload jika Sukses (Perhatikan penggunaan kutip miring / backticks)
+    if (!res || res.status === "error") {
       appContainer.innerHTML = `
-        <div class="title">${data.deskripsi || data.namaAsset || '-'}</div>
-
-        <div class="data-item">
-          <div class="label">Merk / Tipe</div>
-          <div class="value">${data.merk || '-'}</div>
-        </div>
-
-        <div class="data-item">
-          <div class="label">Lokasi</div>
-          <div class="value">${data.lokasi || '-'}</div>
-        </div>
-
-        <div class="data-item">
-          <div class="label">Kuantitas</div>
-          <div class="value">${data.qty || '-'}</div>
-        </div>
-
+        <div class="error-title">Aset Tidak Ditemukan</div>
+        <div class="error-msg">Data dengan No. Seri tersebut tidak terdaftar di sistem.</div>
         <div class="id-badge">ID: ${idScan}</div>
       `;
-    })
-    .catch(err => {
-      appContainer.innerHTML = `
-        <div class="error-title">KONEKSI TERPUTUS</div>
-        <div class="error-msg">Gagal terhubung ke Database. Periksa koneksi internet atau script backend.</div>
-        <div class="id-badge">ID: ${idScan}</div>
-      `;
-    });
+      return;
+    }
+
+    const data = res.data;
+
+    appContainer.innerHTML = `
+      <div class="title">${data.deskripsi || data.namaAsset || '-'}</div>
+
+      <div class="data-item">
+        <div class="label">Merk / Tipe</div>
+        <div class="value">${data.merk || '-'}</div>
+      </div>
+
+      <div class="data-item">
+        <div class="label">Lokasi</div>
+        <div class="value">${data.lokasi || '-'}</div>
+      </div>
+
+      <div class="data-item">
+        <div class="label">Kuantitas</div>
+        <div class="value">${data.qty || '-'}</div>
+      </div>
+
+      <div class="id-badge">ID: ${idScan}</div>
+    `;
+  })
+  .catch(err => {
+    appContainer.innerHTML = `
+      <div class="error-title">KONEKSI TERPUTUS</div>
+      <div class="error-msg">Gagal terhubung ke Database. Periksa koneksi internet atau script backend.</div>
+      <div class="id-badge">ID: ${idScan}</div>
+    `;
+  });
 }
 
 // ==========================================
