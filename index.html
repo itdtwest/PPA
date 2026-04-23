@@ -124,7 +124,11 @@ if(!idScan){
         <div class="id-badge" style="flex:1;margin-right:10px">${idScan}</div>
         <div style="font-size:10px;color:#aaa;font-weight:bold;text-transform:uppercase;background:#eee;padding:4px 8px;border-radius:4px">${src}</div>
       </div>`;
-  }).catch(()=>app.innerHTML=`<div class="error-title">Koneksi gagal</div>`);
+  }).catch((err)=>{
+    app.innerHTML=`<div class="error-title">Koneksi Gagal</div>
+    <div class="error-msg" style="font-size:10px">${err.message || 'Cek koneksi internet atau izin Deployment (Set ke "Anyone")'}</div>`;
+    console.error(err);
+  });
 }
 
 const c=document.getElementById('particleCanvas');
