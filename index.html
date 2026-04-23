@@ -1,11 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Asset Viewer</title>
+  <title>Asset Viewer - CP3 Majalengka</title>
 
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* RESET & BASE */
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
 
     body {
       font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -20,6 +26,7 @@
       overflow-x: hidden;
     }
 
+    /* CANVAS BACKGROUND PARTICLE */
     #particleCanvas {
       position: fixed;
       top: 0; left: 0;
@@ -37,6 +44,7 @@
       z-index: 10;
     }
 
+    /* BACKGROUND LOGOS (FIXED HUD STYLE) */
     .bg-logo-left, .bg-logo-right {
       position: fixed;
       top: 25px;
@@ -44,10 +52,12 @@
       width: auto;
       z-index: 5;
       opacity: 0.9;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
     }
     .bg-logo-left { left: 25px; }
     .bg-logo-right { right: 25px; }
 
+    /* SITE HEADER TEXT */
     .site-header {
       font-size: 20px;
       font-weight: 800;
@@ -56,18 +66,27 @@
       margin-bottom: 25px;
       text-transform: uppercase;
       opacity: 0;
-      animation: fadeIn 0.8s ease forwards;
+      animation: fadeIn 0.8s ease forwards 0.2s;
     }
 
     @keyframes fadeIn { to { opacity: 1; } }
 
+    /* MAIN CARD - GLASSMORPHISM */
     .card {
-      background: rgba(255,255,255,0.95);
+      background: rgba(255, 255, 255, 0.95);
       width: 100%;
       border-radius: 16px;
-      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
       padding: 30px 25px;
-      animation: slideUp 0.6s ease;
+      position: relative;
+      backdrop-filter: blur(5px);
+      animation: slideUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
     }
 
     @keyframes slideUp {
@@ -75,112 +94,155 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    /* TOP ACCENT LINE */
     .card::before {
       content: '';
-      display: block;
-      height: 5px;
-      background: linear-gradient(90deg,#ff4da6,#4dd2ff);
-      border-radius: 8px 8px 0 0;
-      margin: -30px -25px 20px;
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 5px;
+      background: linear-gradient(90deg, #ff4da6, #4dd2ff);
     }
 
+    /* DATA TYPOGRAPHY */
     .title {
       font-size: 20px;
-      font-weight: bold;
+      font-weight: 800;
       margin-bottom: 20px;
       text-align: center;
+      color: #222;
     }
 
     .data-item {
-      background: #f5f5f5;
-      padding: 12px;
+      background: #fcfcfc;
+      padding: 12px 15px;
       border-radius: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
+      border-left: 3px solid #4dd2ff;
+      transition: all 0.3s ease;
     }
+
+    .data-item:nth-child(even) { border-left-color: #ff4da6; }
+    .data-item:hover { background: #f5fbff; border-left-width: 5px; }
+    .data-item:nth-child(even):hover { background: #fff5fa; }
 
     .label {
       font-size: 11px;
       color: #888;
       text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 4px;
     }
 
     .value {
-      font-weight: bold;
+      font-weight: 700;
       font-size: 15px;
+      color: #333;
     }
 
     .id-badge {
-      margin-top: 15px;
+      margin-top: 25px;
       font-size: 12px;
       color: #777;
       text-align: center;
-    }
-
-    .error { color: red; text-align: center; }
-
-    /* Skeleton loading */
-    .skeleton {
-      height: 16px;
-      background: linear-gradient(90deg,#eee,#ddd,#eee);
-      animation: shimmer 1.2s infinite;
+      background: #f9f9f9;
+      padding: 8px;
       border-radius: 6px;
-      margin-bottom: 10px;
-    }
-    @keyframes shimmer {
-      0% { background-position: -200px 0; }
-      100% { background-position: 200px 0; }
+      font-family: monospace;
+      border: 1px dashed #ddd;
     }
 
+    .error-title { color: #d9534f; text-align: center; font-weight: bold; font-size: 18px; margin-bottom: 10px;}
+    .error-msg { text-align: center; color: #666; font-size: 14px; margin-bottom: 20px; }
+
+    /* FOOTER STEALTH */
+    .footer-credit {
+      margin-top: 25px;
+      font-size: 10px;
+      color: #999;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.2;
+      transition: opacity 0.3s ease;
+    }
+    .footer-credit:hover { opacity: 0.8; }
+
+    /* SKELETON LOADING (Animasi Keren) */
+    .skeleton {
+      height: 18px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite linear;
+      border-radius: 6px;
+      margin-bottom: 15px;
+    }
+    
+    .skeleton-title { height: 28px; width: 70%; margin: 0 auto 25px; }
+    .skeleton-box { height: 55px; border-radius: 10px; margin-bottom: 14px; }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
   </style>
 </head>
 
 <body>
 
+<!-- ENGINE CANVAS PARTIKEL ABSTRAK -->
 <canvas id="particleCanvas"></canvas>
 
-<img class="bg-logo-left" src="https://iconlogovector.com/uploads/images/2025/08/lg-688e9cd4b2d3d-Mie-Gacoan.webp">
-<img class="bg-logo-right" src="https://cc.dinus.ac.id/assets/uploads/penyedia/42dfb-pt.-pesta-pora-abadi.png">
+<!-- LOGO HUD FIX BACKGROUND -->
+<img class="bg-logo-left" src="https://iconlogovector.com/uploads/images/2025/08/lg-688e9cd4b2d3d-Mie-Gacoan.webp" alt="Gacoan">
+<img class="bg-logo-right" src="https://cc.dinus.ac.id/assets/uploads/penyedia/42dfb-pt.-pesta-pora-abadi.png" alt="PPA">
 
 <div class="wrapper">
   <div class="site-header">CP3 MAJALENGKA</div>
 
-  <div class="card" id="card">
-    <!-- skeleton -->
-    <div class="skeleton"></div>
-    <div class="skeleton"></div>
-    <div class="skeleton"></div>
+  <div class="card" id="appContainer">
+    <!-- STATE AWAL: SKELETON LOADING -->
+    <div class="skeleton skeleton-title"></div>
+    <div class="skeleton skeleton-box"></div>
+    <div class="skeleton skeleton-box"></div>
+    <div class="skeleton skeleton-box"></div>
   </div>
 
   <div class="footer-credit">IRGA CP3 x Renagge</div>
 </div>
 
 <script>
+// ==========================================
+// 1. ENGINE FETCH API (BACKEND COMMUNICATION)
+// ==========================================
 const API_URL = "https://script.google.com/macros/s/AKfycbycZStaP7DU7cQgSTAnR5Au14bJBaXwvee4QqD7pgeF/exec";
-
 const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
-const card = document.getElementById("card");
+const idScan = params.get("id");
+const appContainer = document.getElementById("appContainer");
 
-if (!id) {
-  card.innerHTML = "<div class='error'>ID tidak ditemukan</div>";
+if (!idScan) {
+  appContainer.innerHTML = `
+    <div class="error-title">INVALID PARAMETER</div>
+    <div class="error-msg">Tidak ada ID yang dikirim. Pastikan URL hasil scan QR memiliki ?id=...</div>
+  `;
 } else {
-  fetch(API_URL + "?id=" + id)
+  // Mengambil data JSON dari Google Apps Script
+  fetch(API_URL + "?id=" + encodeURIComponent(idScan))
     .then(res => res.json())
     .then(data => {
-
-      if (!data) {
-        card.innerHTML = `
-          <div class="error">Aset tidak ditemukan</div>
-          <div class="id-badge">${id}</div>
+      // Jika response gagal atau ID tidak cocok
+      if (!data || data.status === "error") {
+        appContainer.innerHTML = `
+          <div class="error-title">Aset Tidak Ditemukan</div>
+          <div class="error-msg">Data dengan No. Seri tersebut tidak terdaftar di sistem.</div>
+          <div class="id-badge">ID: ${idScan}</div>
         `;
         return;
       }
 
-      card.innerHTML = `
-        <div class="title">${data.deskripsi}</div>
+      // Render Payload jika Sukses (Perhatikan penggunaan kutip miring / backticks)
+      appContainer.innerHTML = `
+        <div class="title">${data.deskripsi || data.namaAsset || '-'}</div>
 
         <div class="data-item">
-          <div class="label">Merk</div>
+          <div class="label">Merk / Tipe</div>
           <div class="value">${data.merk || '-'}</div>
         </div>
 
@@ -190,50 +252,113 @@ if (!id) {
         </div>
 
         <div class="data-item">
-          <div class="label">Qty</div>
+          <div class="label">Kuantitas</div>
           <div class="value">${data.qty || '-'}</div>
         </div>
 
-        <div class="id-badge">ID: ${id}</div>
+        <div class="id-badge">ID: ${idScan}</div>
       `;
     })
-    .catch(() => {
-      card.innerHTML = "<div class='error'>Error load data</div>";
+    .catch(err => {
+      appContainer.innerHTML = `
+        <div class="error-title">KONEKSI TERPUTUS</div>
+        <div class="error-msg">Gagal terhubung ke Database. Periksa koneksi internet atau script backend.</div>
+        <div class="id-badge">ID: ${idScan}</div>
+      `;
     });
 }
 
-/* PARTICLE ENGINE */
+// ==========================================
+// 2. ENGINE PARTIKEL ABSTRAK (CONFETTI MODE)
+// ==========================================
 const canvas = document.getElementById('particleCanvas');
 const ctx = canvas.getContext('2d');
 let w = canvas.width = window.innerWidth;
 let h = canvas.height = window.innerHeight;
 
-window.onresize = () => {
+window.addEventListener('resize', () => {
   w = canvas.width = window.innerWidth;
   h = canvas.height = window.innerHeight;
-};
+});
 
+// Palet Warna Dikunci (Cyan PPA & Pink Gacoan)
+const colors = ['#ff4da6', '#4dd2ff'];
 let particles = [];
 
-for (let i=0;i<50;i++){
-  particles.push({
-    x: Math.random()*w,
-    y: Math.random()*h,
-    size: Math.random()*5+2,
-    speed: Math.random()+0.5
-  });
+// Struktur Class Partikel
+class Confetti {
+  constructor() {
+    this.reset();
+    this.y = Math.random() * h; // Sebaran awal di seluruh layar
+  }
+
+  reset() {
+    this.x = Math.random() * w;
+    this.y = -20; // Muncul dari langit-layar
+    this.size = Math.random() * 8 + 3; // Ukuran random
+    this.speedY = Math.random() * 1.5 + 0.5; // Kecepatan jatuh (gravitasi pelan)
+    this.angle = Math.random() * Math.PI * 2; // Sudut putar
+    this.spinSpeed = (Math.random() - 0.5) * 0.1; // Kecepatan putar
+    this.swaySpeed = (Math.random() - 0.5) * 0.05; 
+    this.sway = Math.random() * Math.PI * 2;
+    this.color = colors[Math.floor(Math.random() * colors.length)];
+    this.shape = Math.floor(Math.random() * 3); // 0=Kotak, 1=PersegiPanjang, 2=Pita/Kurva
+  }
+
+  update() {
+    this.y += this.speedY;
+    this.sway += this.swaySpeed;
+    this.x += Math.sin(this.sway) * 0.8; // Efek tertiup angin ringan
+    this.angle += this.spinSpeed;
+    
+    // Reset kalau jatuh melewati layar bawah
+    if (this.y > h + 20) this.reset();
+  }
+
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle);
+    ctx.globalAlpha = 0.85; // Agar warnanya bold tapi nyatu dengan bg
+
+    if (this.shape === 0) {
+      // Kotak
+      ctx.fillStyle = this.color;
+      ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+    } else if (this.shape === 1) {
+      // Persegi Panjang
+      ctx.fillStyle = this.color;
+      ctx.fillRect(-this.size, -this.size/2, this.size*2, this.size);
+    } else {
+      // Bentuk Pita Melengkung (Ribbon/Curve)
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.arc(0, 0, this.size, 0, Math.PI);
+      ctx.stroke();
+    }
+    
+    ctx.restore();
+  }
 }
 
-function animate(){
-  ctx.clearRect(0,0,w,h);
-  particles.forEach(p=>{
-    p.y += p.speed;
-    if(p.y>h) p.y=0;
-    ctx.fillStyle = "#4dd2ff33";
-    ctx.fillRect(p.x,p.y,p.size,p.size);
+// Injeksi 60 partikel ke RAM
+for (let i = 0; i < 60; i++) {
+  particles.push(new Confetti());
+}
+
+// Render Loop (Mirip logic Loop() di mikrokontroler)
+function animate() {
+  ctx.clearRect(0, 0, w, h);
+  particles.forEach(p => {
+    p.update();
+    p.draw();
   });
   requestAnimationFrame(animate);
 }
+
+// Start DMA rendering!
 animate();
 </script>
 
