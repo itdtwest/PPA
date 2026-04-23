@@ -116,7 +116,7 @@ if(!idScan){
     }
     const d=res.data, src=res.source==="cache"?"⚡ Cached":"☁️ Realtime";
     app.innerHTML=`<div class="title">${d.namaAsset||d.deskripsi||'-'}</div>
-      <div class="data-item"><div class="label">No / ID</div><div class="value">${d.no||'-'}</div></div>
+      <div class="data-item"><div class="label">No / ID</div><div class="value">${idScan}</div></div>
       <div class="data-item"><div class="label">Dekripsi</div><div class="value">${d.deskripsi||'-'}</div></div>
       <div class="data-item"><div class="label">Lokasi</div><div class="value">${d.lokasi||'-'}</div></div>
       <div class="data-item"><div class="label">Qty</div><div class="value">${d.qty||'-'}</div></div>
